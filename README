@@ -1,72 +1,19 @@
-# Linux kernel
-============
+test_new_syscall has been added to the Makefile.
 
-This file was moved to Documentation/admin-guide/README.rst
+after typing "make" the executable "test" will be created.
 
-Please notice that there are several guides for kernel developers and users.
-These guides can be rendered in a number of formats, like HTML and PDF.
+then to use run_test.sh, you need to add ./adb to your path.
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.
+to add ./adb to PATH:
+copy the code below into ~/.bashrc
 
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
-See Documentation/00-INDEX for a list of what is contained in each file.
+export PATH=$PATH:~/Android/Sdk/platform-tools
 
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
+and then type: source ~/.bashrc
 
+Now you can run_test.sh
 
-# Team 11
-=======
-
-## How is a process distinguished from tread?
-See KernelDev pg. 71-72
+If you don't want to add to path, then just run what is in
+run_test.sh manually. Its only intent is to speed up the process.
 
 
-You might be wondering why does getpid() return tgid, the thread group ID? In normal processes,
-the TGID is equal to the PID. With threads, the TGID is the same for all threads in a thread
-group. This enables the threads to call getpid() and get the same PID.
-
-
-http://man7.org/linux/man-pages/man2/gettid.2.html
-
-
-kernel/sys.c
-
-Line 882
-/**
- * sys_getpid - return the thread group id of the current process
- *
- * Note, despite the name, this returns the tgid not the pid.  The tgid and
- * the pid are identical unless CLONE_THREAD was specified on clone() in
- * which case the tgid is the same in all threads of the same group.
- *
- * This is SMP safe as current->tgid does not change.
- */
-SYSCALL_DEFINE0(getpid)
-{
-	return task_tgid_vnr(current);
-}
-
-/* Thread ID - the internal kernel "pid" */
-SYSCALL_DEFINE0(gettid)
-{
-	return task_pid_vnr(current);
-
-
-ps -AT, in the emulator will show threads
-
-For getting a value from user space:
-	//  https://elixir.bootlin.com/linux/v4.14.112/source/arch/x86/include/asm/uaccess.h#L171
-	//  instead of copy_from_user(src, dst, size), use get_user
-
-	typedef struct {
-    	uid_t val;
-    } kuid_t;
-
-
-    typedef struct {
-    	gid_t val;
-    } kgid_t;
